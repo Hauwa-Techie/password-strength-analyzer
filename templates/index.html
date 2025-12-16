@@ -1,27 +1,190 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Password Strength Analyzer</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #1f2933, #111827);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .creator {
+            text-align: center;
+            font-size: 0.9em;
+            color: #9ca3af;
+            margin-bottom: 25px;
+        }
+
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 40px 12px 12px;
+            border-radius: 6px;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        .toggle-eye {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 1.1em;
+            color: #9ca3af;
+            user-select: none;
+        }
+
+        .toggle-eye:hover {
+            color: #ffffff;
+        }
+
+        .strength {
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .Weak { color: #ef4444; }
+        .Medium { color: #facc15; }
+        .Strong { color: #22c55e; }
+
+        ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        li {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.8em;
+            color: #9ca3af;
+        }
+
+        input:focus {
+            box-shadow: 0 0 5px #2563eb;
+        }
+
+        button {
+            display: none; /* optional if you want to remove submit button */
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>Password Strength Analyzer</h1>
+<div class="container">
+    <h1>Password Strength Analyzer</h1>
+    <div class="creator">Created by Hauwa Abdulraheem</div>
 
-<form method="POST">
-    <input type="password" name="password" placeholder="Enter password" required>
-    <button type="submit">Check</button>
-</form>
+    <!-- Password input with custom eye toggle -->
+    <div class="password-wrapper">
+        <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+            oninput="analyzePassword()"
+        >
+        <span class="toggle-eye" onclick="togglePassword()">👁</span>
+    </div>
 
-{% if result %}
-<h2>Strength: {{ result }}</h2>
+    <div id="strength" class="strength"></div>
+    <ul id="feedback"></ul>
 
-<ul>
-{% for item in feedback %}
-<li>{{ item }}</li>
-{% endfor %}
-</ul>
+    <footer>
+        © 2025 • Cybersecurity Awareness Project
+    </footer>
+</div>
 
-{% endif %}
+<script>
+    // Toggle password visibility
+    function togglePassword() {
+        const input = document.getElementById("password");
+        input.type = input.type === "password" ? "text" : "password";
+    }
+
+    // Real-time password strength analysis
+    function analyzePassword() {
+        const password = document.getElementById("password").value;
+        const strengthDiv = document.getElementById("strength");
+        const feedbackList = document.getElementById("feedback");
+
+        let score = 0;
+        let feedback = [];
+
+        // Length check
+        if (password.length >= 10) score++;
+        else feedback.push("At least 10 characters required.");
+
+        // Uppercase
+        if (/[A-Z]/.test(password)) score++;
+        else feedback.push("Add an uppercase letter.");
+
+        // Lowercase
+        if (/[a-z]/.test(password)) score++;
+        else feedback.push("Add a lowercase letter.");
+
+        // Number
+        if (/[0-9]/.test(password)) score++;
+        else feedback.push("Add a number.");
+
+        // Special character
+        if (/[!@#$%^&*()]/.test(password)) score++;
+        else feedback.push("Add a special character.");
+
+        // Determine strength
+        let strength = "";
+        if (score <= 2) strength = "Weak";
+        else if (score <= 4) strength = "Medium";
+        else strength = "Strong";
+
+        // Display strength
+        strengthDiv.textContent = password ? `Strength: ${strength}` : "";
+        strengthDiv.className = `strength ${strength}`;
+
+        // Display feedback
+        feedbackList.innerHTML = "";
+        feedback.forEach(item => {
+            const li = document.createElement("li");
+            li.textContent = item;
+            feedbackList.appendChild(li);
+        });
+    }
+</script>
 
 </body>
 </html>
